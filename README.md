@@ -1,11 +1,31 @@
-Welcome to Glitch 
-================
-
-Click `Show` in the header to see your app live. Updates to your code will instantly deploy and update live.
-
-
-Socket.io Cheat Sheet
+Intro to Socket.io
 ====================
+[Socket.io](http://socket.io) is a javascript library that runs in both the browser and server to allow realtime communication between the two. This allows for collaborative web experiences where many people can interact on the same page, all without using a cumbersome database or even much backend code.
+
+Socket.io does this by having both a client-side and a server-side library which communicate with each other through named events that pass between the two (similar to the way keyboard and mouse events are handled).
+
+Below is a rough guide to how socket.io works on the client side and on the server side, and how the two communicate.
+
+#### Client Side
+On the client side, the socket.io client library needs to be included in the HTML:
+```javascript
+<script src= 'https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js'></script>
+```
+And the following line needs to be included at the top of your client.js file:
+```javascript
+var socket = io()
+```
+The client can then send messages to the server in the following form
+```javascript
+//the function takes a string and then an object full of data (any size)
+socket.emit('nameOfEvent', {data: "data you are sending to the server"})
+```
+And the client can listen for messages from the server like so:
+```javascript
+socket.on('nameOfServerEvent', function(data){
+  //the code you want to use on the data sent back from the server
+}
+```
 
 #### Server Side
 Just about all of your socket.io programs are going to want the following boilerplate in the server.js file.
@@ -45,24 +65,7 @@ function newConnection(socket){
   socket.broadcast.to(socketid).emit('message', 'for your eyes only');
 ```
 
-#### Client Side
-On the client side, the socket.io client library needs to be included in the HTML:
-```<script src= 'https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js'></script>```
-And the following line needs to be included at the top of your client.js file:
-```javascript
-var socket = io()
-```
-The client can then send messages to the server in the following form
-```javascript
-//the function takes a string and then an object full of data (any size)
-socket.emit('nameOfEvent', {data: "data you are sending to the server"})
-```
-And the client can listen for messages from the server like so:
-```javascript
-socket.on('nameOfServerEvent', function(data){
-  //the code you want to use on the data sent back from the server
-}
-```
+
 
 
 #### Message Passing Example: Chat Room
@@ -86,4 +89,14 @@ function newConnection(socket){
    }
 }
 ```
-The server receives the message and then sends it out to all other connected c
+The server receives the message and then sends it out to all other connected clients. This message from the server is then handled by the following code on the client:
+```javascript
+
+socket.on('newMsgFromServer', function(data){
+	addMsg(data.username, data.msg)
+})
+//This function uses jQuery to add the message to the HTML
+function addMsg(user, msg){
+	$('#messages').append("<p><strong>"+user+": </strong>"+msg+"</p>")
+}
+```
