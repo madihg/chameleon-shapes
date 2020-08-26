@@ -21,5 +21,5 @@ function sendMsg(){
 }
 function addMsg(user, msg){
 	$('#messages').append("<p><strong>"+user+": </strong>"+msg+"</p>")
-
+  $('#messages').scrollTop($('#messages').get(0).scrollHeight)
 }
