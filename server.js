@@ -9,5 +9,13 @@ var io = socket(server);
 io.sockets.on('connection', newConnection);
 
 function newConnection(socket){
-
+  // will send to everyone but the original sender
+	// socket.on('newMsg', newMsg);
+	// function newMsg(data){
+	// 	socket.broadcast.emit('newMsgFromServer', data);
+	// 	//the line below will send to everyone including the client
+	// 	// io.sockets.emit('mouse', data);
+	// 	console.log(data)
+	// }
+  
 }
