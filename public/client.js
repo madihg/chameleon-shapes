@@ -4,5 +4,5 @@
 
 //example event listener
 // socket.on('newMsgFromServer', function(data){
-// 	addMsg(data.username, data.msg)
+// 	  do something with data
 // })
