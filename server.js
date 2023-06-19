@@ -4,7 +4,14 @@ let server = app.listen(process.env.PORT || 3000);
 app.use(express.static('public'));
 console.log('server running')
 let socket = require('socket.io');
-let io = socket(server);
+let io = socket(server, {
+  //this allows external websites to connect
+  cors: {
+    origin: true
+  },
+  //this allows older socket versions to connect
+  allowEIO3: true
+});
 
 io.sockets.on('connection', newConnection);
 
