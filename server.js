@@ -13,10 +13,14 @@ let io = socket(server, {
   allowEIO3: true
 });
 
+let messages = []
+
 io.sockets.on('connection', newConnection);
 
 function newConnection(socket){
+  socket.emit("loadMessages", messages)
   socket.on("sendMessage", function(message){
+    messages.push(message)
     io.emit("sendMessage", message)
   })
   // socket.on("newMsg", function(data){
