@@ -1,14 +1,22 @@
-<input />
-<button onclick="buttonPressed()">
-  Click me
-</button>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkbox Sync</title>
+    <style>
+        .checkbox-container { display: flex; flex-wrap: wrap; }
+        .checkbox-container input { margin: 10px; }
+    </style>
+</head>
+<body>
+<div class="checkbox-container">
+    <!-- JavaScript will insert checkboxes here -->
+</div>
+<div>Your Score: <span id="user-score">0</span></div>
+<div>Total Checked: <span id="total-checked">0</span></div>
 
-<!-- Put your html above these scripts -->
-<!-- <script
-  src="https://code.jquery.com/jquery-2.2.4.min.js"
-  integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
-  crossorigin="anonymous"></script> -->
-<script
-  src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.min.js"
-></script>
-<script src='client.js'></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.min.js"></script>
+<script src="client.js"></script>
+</body>
+</html>

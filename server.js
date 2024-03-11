@@ -1,33 +1,42 @@
-let express = require('express'); 
-let app = express();
-let server = app.listen(process.env.PORT || 3000);
+const express = require('express');
+const app = express();
+const server = app.listen(process.env.PORT || 3000, () => console.log('Server running'));
 app.use(express.static('public'));
-console.log('server running')
-let socket = require('socket.io');
-let io = socket(server, {
-  //this allows external websites to connect
-  cors: {
-    origin: true
-  },
-  //this allows older socket versions to connect
-  allowEIO3: true
+
+const socket = require('socket.io');
+const io = socket(server, {
+    cors: {
+        origin: "*",
+    },
+    allowEIO3: true, // for backward compatibility
 });
 
-let messages = []
+// Track the checked state of each checkbox and user scores
+let checkedCheckboxes = Array(100).fill(false);
+let userScores = {}; // key: socket.id, value: score
 
-io.sockets.on('connection', newConnection);
+io.on('connection', (socket) => {
+    // Send initial setup to just connected user
+    socket.emit('setup', { checkedCheckboxes, score: userScores[socket.id] || 0 });
 
-function newConnection(socket){
-  socket.emit("loadMessages", messages)
-  socket.on("sendMessage", function(message){
-    messages.push(message)
-    io.emit("sendMessage", message)
-  })
-  // socket.on("newMsg", function(data){
-  // //send a message to everyone
-  //   io.emit("newMsgFromServer", data)
-  // //send a message to just the person who sent the original
-  //   socket.emit("newMsgFromServer", data)
-  // })
-  
-}
+    // Listen for checkbox click events
+    socket.on('checkboxClicked', (index) => {
+        // Toggle the checked state of the checkbox
+        checkedCheckboxes[index] = !checkedCheckboxes[index];
+        
+        // Update the user's score
+        userScores[socket.id] = (userScores[socket.id] || 0) + 1;
+        
+        // Calculate the total number of checked checkboxes
+        let totalChecked = checkedCheckboxes.filter(checked => checked).length;
+        
+        // Broadcast the updated checked states, total checked, and user scores to all users
+        io.emit('update', { checkedCheckboxes, totalChecked, userScores });
+    });
+
+    // Optionally, handle user disconnection
+    socket.on('disconnect', () => {
+        // Implement any cleanup or notification logic here
+        // Note: You might want to adjust scores or checked states based on your app's logic
+    });
+});
