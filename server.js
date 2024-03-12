@@ -1,35 +1,29 @@
-const express = require("express");
+const express = require('express');
 const app = express();
-const server = app.listen(process.env.PORT || 3000, () =>
-  console.log("Server running")
-);
-app.use(express.static("public"));
+const server = app.listen(process.env.PORT || 3000, () => console.log('Server running'));
+app.use(express.static('public'));
 
-const socket = require("socket.io");
+const socket = require('socket.io');
 const io = socket(server, {
-  cors: {
-    origin: "*",
-  },
+    cors: { origin: "*" },
 });
 
-io.on("connection", (socket) => {
-  socket.on("mapClick", (point) => {
-    // Broadcast the click position to all clients except the sender
-    socket.broadcast.emit("mapClick", point);
-  });
-});
-<div id="user-count">Number of friends currently checking boxes: 0</div>;
+let userCount = 0;
+const colors = ['red', 'green', 'blue', 'purple', 'orange']; // Add more colors as needed
 
-let userCount = 0; // Track the number of connected users
+io.on('connection', (socket) => {
+    userCount++;
+    const userColor = colors[userCount % colors.length]; // Assign a color in a round-robin fashion
+    socket.emit('init', { userColor, userCount }); // Send initial data to the newly connected client
+    io.emit('userCount', userCount); // Update all clients with the new user count
 
-io.on("connection", (socket) => {
-  userCount++; // Increment user count on new connection
-  io.emit("userCount", userCount); // Emit the updated count to all clients
+    socket.on('drawLine', (data) => {
+        data.color = userColor; // Attach the user's color to the line data
+        socket.broadcast.emit('drawLine', data);
+    });
 
-  // Your existing connection logic here...
-
-  socket.on("disconnect", () => {
-    userCount--; // Decrement user count on disconnection
-    io.emit("userCount", userCount); // Emit the updated count to all clients
-  });
+    socket.on('disconnect', () => {
+        userCount--;
+        io.emit('userCount', userCount); // Update all clients with the new user count
+    });
 });
