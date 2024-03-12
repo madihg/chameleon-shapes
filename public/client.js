@@ -1,35 +1,23 @@
 const socket = io();
-const canvas = document.querySelector('canvas');
-const ctx = canvas.getContext('2d');
-const mapContainer = document.getElementById('map-container');
-const mapImage = document.getElementById('map-image');
-const points = []; // Local storage of points
+const mapImage = document.getElementById("map-image");
 
-// Adjust canvas size to match the map image
-canvas.width = mapImage.offsetWidth;
-canvas.height = mapImage.offsetHeight;
+mapImage.addEventListener("click", (e) => {
+  const rect = mapImage.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  const point = { x: x / mapImage.offsetWidth, y: y / mapImage.offsetHeight }; // Normalize points based on image size
 
-mapContainer.addEventListener('click', (e) => {
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const point = { x: x / canvas.width, y: y / canvas.height }; // Normalize points
-
-    points.push(point);
-    drawLine();
-    socket.emit('drawLine', point); // Send point to server
+  // Emit the normalized click position to the server
+  socket.emit("mapClick", point);
 });
 
-function drawLine() {
-    if (points.length < 2) return;
-    ctx.beginPath();
-    ctx.moveTo(points[0].x * canvas.width, points[0].y * canvas.height);
-    points.forEach(point => ctx.lineTo(point.x * canvas.width, point.y * canvas.height));
-    ctx.stroke();
-}
-
-// Listen for line drawing from other users
-socket.on('drawLine', (point) => {
-    points.push(point);
-    drawLine();
+// Optional: Listen for clicks from other users if you want to do something with that information
+socket.on("mapClick", (point) => {
+  // Handle incoming click positions from other users if needed
+});
+socket.on("userCount", (count) => {
+  // Assuming you have an element with the ID 'user-count' to display the count
+  document.getElementById(
+    "user-count"
+  ).textContent = `Number of friends currently mapping their journey: ${count}`;
 });
