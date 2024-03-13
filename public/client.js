@@ -1,46 +1,38 @@
-let socket = io();
+let socket = io.connect();
+let userColor = `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.5)`; // Unique color for each user
 
-const sketch = (p) => {
-    let userColor; // Will be defined on setup
+function setup() {
+    let cnv = createCanvas(windowWidth, windowHeight);
+    cnv.style('position', 'absolute');
+    cnv.style('z-index', '2'); // Ensure canvas is above the background image
+    background(255, 255, 255, 0); // Transparent background
 
-    p.setup = () => {
-        let cnv = p.createCanvas(p.windowWidth, p.windowHeight);
-        cnv.style('position', 'absolute');
-        p.clear();
-        userColor = `rgba(${parseInt(p.random(255))}, ${parseInt(p.random(255))}, ${parseInt(p.random(255))}, 0.5)`; // Assign a random semi-transparent color
+    // Drawing received from server
+    socket.on('draw', function(data) {
+        stroke(data.color);
+        strokeWeight(10);
+        line(data.x, data.y, data.px, data.py);
+    });
+
+    // Update user count
+    socket.on('userCount', function(count) {
+        document.getElementById('user-count').textContent = `${count} are coloring the chameleon`;
+    });
+}
+
+function mouseDragged() {
+    // Send this user's drawing data to the server
+    let data = {
+        x: mouseX,
+        y: mouseY,
+        px: pmouseX,
+        py: pmouseY,
+        color: userColor
     };
+    socket.emit('draw', data);
 
-    p.draw = () => {
-        // Drawing logic remains the same
-    };
-
-    p.mouseDragged = () => {
-        p.stroke(userColor);
-        p.strokeWeight(10);
-        p.line(p.mouseX, p.mouseY, p.pmouseX, p.pmouseY);
-        socket.emit('draw', {
-            x: p.mouseX,
-            y: p.mouseY,
-            px: p.pmouseX,
-            py: p.pmouseY,
-            color: userColor
-        });
-    };
-};
-
-// Handle drawing from other clients
-socket.on('draw', (data) => {
-    const p = this;
-    if(p){
-        p.stroke(data.color);
-        p.strokeWeight(10);
-        p.line(data.x, data.y, data.px, data.py);
-    }
-});
-
-// Update user count directly via Socket.IO
-socket.on('userCount', (count) => {
-    document.getElementById('userCount').textContent = `${count} folks are coloring the chameleon`;
-});
-
-new p5(sketch);
+    // Also draw on this user's canvas for immediate feedback
+    stroke(userColor);
+    strokeWeight(10);
+    line(mouseX, mouseY, pmouseX, pmouseY);
+}
