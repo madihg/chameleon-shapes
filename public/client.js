@@ -16,7 +16,7 @@ function setup() {
 
     // Update user count
     socket.on('userCount', function(count) {
-        document.getElementById('user-count').textContent = `${count} are coloring the chameleon`;
+        document.getElementById('user-count').textContent = `${count} other(s)`;
     });
 }
 

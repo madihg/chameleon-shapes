@@ -32,19 +32,51 @@
         border-radius: 5px;
         z-index: 3; /* Ensure it's above the canvas and image */
       }
+      #textInputContainer {
+        position: absolute;
+        bottom: 100px; /* Adjust as needed */
+        left: 10px; /* Adjust as needed */
+        z-index: 10;
+      }
+      #specialTextField {
+        width: 150px;
+      }
+      .hidden {
+        display: none;
+      }
     </style>
   </head>
   <body>
     <div id="container">
-    <img
-      id="backgroundImage"
-      src="https://img.freepik.com/premium-vector/sketch-chameleon-hand-drawn-illustration-isolated-white_183342-207.jpg"
-      alt="Background"
-    />
-    <div id="user-count">Loading...</div>
+      <img
+        id="backgroundImage"
+        src="https://timcoster.files.wordpress.com/2016/10/chameleonsmallwhitebg.png"
+        alt="Background"
+      />
+      <div id="user-count">Loading...</div>
+    </div>
+    <div id="textInputContainer">
+      <input type="text" id="specialTextField" placeholder="Where is home for you?" />
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
     <script src="client.js"></script>
+        <script>
+      document.getElementById('specialTextField').addEventListener('input', function() {
+        const value = this.value;
+        const container = document.getElementById('textInputContainer');
+        
+        // Check if the special message is typed and if the button already exists
+        if (value.toLowerCase() === 'you are not alone' && !document.getElementById('specialButton')) {
+          const button = document.createElement('button');
+          button.id = 'specialButton';
+          button.textContent = 'maybe';
+          button.onclick = function() {
+            window.location.href = 'https://example.com'; // Replace with the actual URL
+          };
+          container.appendChild(button);
+        }
+      });
+    </script>
   </body>
 </html>
