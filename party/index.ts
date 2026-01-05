@@ -1,20 +1,14 @@
 import type * as Party from "partykit/server";
 
-class DrawingRoom implements Party.Server {
+export default class DrawingRoom implements Party.Server {
   constructor(readonly room: Party.Room) {}
 
   onConnect(conn: Party.Connection, ctx: Party.ConnectionContext) {
-    // Add connection to our map
-    connections.set(conn.id, conn);
-    
     // Broadcast updated user count to all clients
     this.broadcastUserCount();
   }
 
   onClose(conn: Party.Connection) {
-    // Remove connection from our map
-    connections.delete(conn.id);
-    
     // Broadcast updated user count to all clients
     this.broadcastUserCount();
   }
@@ -33,13 +27,10 @@ class DrawingRoom implements Party.Server {
   }
 
   broadcastUserCount() {
-    const count = this.room.getConnections().length;
+    const count = [...this.room.getConnections()].length;
     this.room.broadcast(JSON.stringify({ 
       type: "userCount", 
       count 
     }));
   }
 }
-
-export { DrawingRoom as default };
-
