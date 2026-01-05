@@ -1,38 +1,81 @@
-let socket = io.connect();
-let userColor = `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.5)`; // Unique color for each user
+// PartyKit connection - will be set after DOM loads
+let socket;
+let userColor = `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.5)`;
 
-function setup() {
-    let cnv = createCanvas(windowWidth, windowHeight);
-    cnv.style('position', 'absolute');
-    cnv.style('z-index', '2'); // Ensure canvas is above the background image
-    background(255, 255, 255, 0); // Transparent background
+// PartyKit host - update this after deploying your PartyKit server
+const PARTYKIT_HOST = window.location.hostname === "localhost" 
+  ? "localhost:1999" 
+  : "chameleon-shapes.partykit.dev"; // Update this with your PartyKit URL after deploy
 
-    // Drawing received from server
-    socket.on('draw', function(data) {
+function connectToParty() {
+  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+  const wsUrl = `${protocol}//${PARTYKIT_HOST}/party/main`;
+  
+  socket = new WebSocket(wsUrl);
+  
+  socket.onopen = () => {
+    console.log("Connected to PartyKit");
+  };
+  
+  socket.onmessage = (event) => {
+    try {
+      const data = JSON.parse(event.data);
+      
+      if (data.type === "draw") {
+        // Drawing received from server
         stroke(data.color);
         strokeWeight(10);
         line(data.x, data.y, data.px, data.py);
-    });
+      } else if (data.type === "userCount") {
+        // Update user count
+        document.getElementById('user-count').textContent = `${data.count} animal(s) that change(s)`;
+      }
+    } catch (e) {
+      console.error("Error parsing message:", e);
+    }
+  };
+  
+  socket.onclose = () => {
+    console.log("Disconnected from PartyKit, reconnecting...");
+    setTimeout(connectToParty, 1000);
+  };
+  
+  socket.onerror = (error) => {
+    console.error("WebSocket error:", error);
+  };
+}
 
-    // Update user count
-    socket.on('userCount', function(count) {
-        document.getElementById('user-count').textContent = `${count} other animal(s) that change(s)`;
-    });
+function setup() {
+  let cnv = createCanvas(windowWidth, windowHeight);
+  cnv.style('position', 'absolute');
+  cnv.style('z-index', '2');
+  background(255, 255, 255, 0); // Transparent background
+  
+  // Connect to PartyKit
+  connectToParty();
 }
 
 function mouseDragged() {
-    // Send this user's drawing data to the server
+  // Only send if socket is connected
+  if (socket && socket.readyState === WebSocket.OPEN) {
     let data = {
-        x: mouseX,
-        y: mouseY,
-        px: pmouseX,
-        py: pmouseY,
-        color: userColor
+      type: "draw",
+      x: mouseX,
+      y: mouseY,
+      px: pmouseX,
+      py: pmouseY,
+      color: userColor
     };
-    socket.emit('draw', data);
+    socket.send(JSON.stringify(data));
+  }
+  
+  // Also draw on this user's canvas for immediate feedback
+  stroke(userColor);
+  strokeWeight(10);
+  line(mouseX, mouseY, pmouseX, pmouseY);
+}
 
-    // Also draw on this user's canvas for immediate feedback
-    stroke(userColor);
-    strokeWeight(10);
-    line(mouseX, mouseY, pmouseX, pmouseY);
+// Handle window resize
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
 }

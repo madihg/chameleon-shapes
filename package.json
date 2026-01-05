@@ -1,28 +1,25 @@
 {
-  "//1": "describes your app and its dependencies",
-  "//2": "https://docs.npmjs.com/files/package.json",
-  "//3": "updating this file will download and update your packages",
-  "name": "my-glitch-app",
-  "version": "0.0.1",
-  "description": "What am I about?",
-  "main": "server.js",
+  "name": "chameleon-shapes",
+  "version": "1.0.0",
+  "description": "Collaborative drawing app where users draw together over a chameleon image",
   "scripts": {
-    "start": "node server.js"
+    "dev": "partykit dev",
+    "deploy:partykit": "partykit deploy"
   },
   "dependencies": {
-    "express": "^4.17.1",
-    "socket.io": "^4.2.0"
+    "partysocket": "^1.0.1"
+  },
+  "devDependencies": {
+    "partykit": "^0.0.111"
   },
   "engines": {
-    "node": "16.x"
-  },
-  "repository": {
-    "url": "https://glitch.com/edit/#!/welcome-project"
+    "node": "18.x"
   },
   "license": "MIT",
   "keywords": [
-    "node",
-    "glitch",
-    "express"
+    "collaborative",
+    "drawing",
+    "partykit",
+    "realtime"
   ]
 }

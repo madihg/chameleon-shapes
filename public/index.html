@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Collaborative Drawing over Image</title>
+  <title>Chameleon Shapes - Collaborative Drawing</title>
   <style>
     body,
     html {
@@ -23,10 +23,10 @@
       width: 400px;
     }
     #textInputContainer {
-      position: fixed; /* Use fixed positioning for constant location */
-      bottom: 10px; /* Adjust vertical position from bottom */
-      left: 10px; /* Adjust horizontal position from left */
-      display: flex; /* Arrange elements horizontally */
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      display: flex;
       z-index: 10;
     }
     #user-count {
@@ -35,7 +35,7 @@
       background: rgba(0, 0, 0, 0.5);
       padding: 5px;
       border-radius: 5px;
-      margin-right: 5px; /* Add spacing between elements */
+      margin-right: 5px;
     }
     #specialTextField {
       width: 150px;
@@ -57,10 +57,9 @@
     <div id="user-count">Animal(s) that change(s)</div>
     <input type="text" id="specialTextField" placeholder="searching for home" />
   </div>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
   <script src="client.js"></script>
-    <script>
+  <script>
     document
       .getElementById("specialTextField")
       .addEventListener("input", function () {
@@ -76,7 +75,7 @@
           button.id = "specialButton";
           button.textContent = "we learn to cross";
           button.onclick = function () {
-            window.location.href = "https://how-do-you-home.glitch.me/"; // Replace with the actual URL
+            window.location.href = "https://how-do-you-home.glitch.me/";
           };
           container.appendChild(button);
         }
