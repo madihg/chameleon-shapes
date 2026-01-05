@@ -27,3 +27,6 @@ npm-debug.log*
 # TypeScript
 *.tsbuildinfo
 
+.config/
+.glitchdotcom.json
+.node-gyp
