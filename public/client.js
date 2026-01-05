@@ -5,7 +5,7 @@ let userColor = `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.rand
 // PartyKit host - update this after deploying your PartyKit server
 const PARTYKIT_HOST = window.location.hostname === "localhost" 
   ? "localhost:1999" 
-  : "chameleon-shapes.partykit.dev"; // Update this with your PartyKit URL after deploy
+  : "chameleon-shapes.madihg.partykit.dev";
 
 function connectToParty() {
   const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";

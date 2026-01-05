@@ -1,9 +1,6 @@
 import type * as Party from "partykit/server";
 
-// Store connected users
-const connections = new Map<string, Party.Connection>();
-
-export default class DrawingRoom implements Party.Server {
+class DrawingRoom implements Party.Server {
   constructor(readonly room: Party.Room) {}
 
   onConnect(conn: Party.Connection, ctx: Party.ConnectionContext) {
