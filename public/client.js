@@ -1,8 +1,8 @@
-// PartyKit connection - will be set after DOM loads
+// PartyKit connection
 let socket;
 let userColor = `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.5)`;
 
-// PartyKit host - update this after deploying your PartyKit server
+// PartyKit host
 const PARTYKIT_HOST = window.location.hostname === "localhost" 
   ? "localhost:1999" 
   : "chameleon-shapes.madihg.partykit.dev";
@@ -22,12 +22,16 @@ function connectToParty() {
       const data = JSON.parse(event.data);
       
       if (data.type === "draw") {
-        // Drawing received from server
+        // Convert normalized coordinates back to local screen coordinates
+        const localX = data.nx * windowWidth;
+        const localY = data.ny * windowHeight;
+        const localPX = data.npx * windowWidth;
+        const localPY = data.npy * windowHeight;
+        
         stroke(data.color);
-        strokeWeight(10);
-        line(data.x, data.y, data.px, data.py);
+        strokeWeight(Math.max(5, windowWidth * 0.008)); // Responsive stroke
+        line(localX, localY, localPX, localPY);
       } else if (data.type === "userCount") {
-        // Update user count
         document.getElementById('user-count').textContent = `${data.count} animal(s) that change(s)`;
       }
     } catch (e) {
@@ -49,33 +53,61 @@ function setup() {
   let cnv = createCanvas(windowWidth, windowHeight);
   cnv.style('position', 'absolute');
   cnv.style('z-index', '2');
-  background(255, 255, 255, 0); // Transparent background
+  clear(); // Transparent background
   
-  // Connect to PartyKit
   connectToParty();
 }
 
+function draw() {
+  // Empty draw loop needed for p5.js
+}
+
+// Handle both mouse and touch
 function mouseDragged() {
-  // Only send if socket is connected
+  sendDrawing(mouseX, mouseY, pmouseX, pmouseY);
+  return false; // Prevent default
+}
+
+function touchMoved() {
+  if (touches.length > 0) {
+    sendDrawing(touches[0].x, touches[0].y, pmouseX, pmouseY);
+  }
+  return false; // Prevent scrolling
+}
+
+function sendDrawing(x, y, px, py) {
+  // Normalize coordinates to 0-1 range for cross-device sync
+  const nx = x / windowWidth;
+  const ny = y / windowHeight;
+  const npx = px / windowWidth;
+  const npy = py / windowHeight;
+  
   if (socket && socket.readyState === WebSocket.OPEN) {
     let data = {
       type: "draw",
-      x: mouseX,
-      y: mouseY,
-      px: pmouseX,
-      py: pmouseY,
+      nx: nx,
+      ny: ny,
+      npx: npx,
+      npy: npy,
       color: userColor
     };
     socket.send(JSON.stringify(data));
   }
   
-  // Also draw on this user's canvas for immediate feedback
+  // Draw locally for immediate feedback
   stroke(userColor);
-  strokeWeight(10);
-  line(mouseX, mouseY, pmouseX, pmouseY);
+  strokeWeight(Math.max(5, windowWidth * 0.008)); // Responsive stroke
+  line(x, y, px, py);
 }
 
-// Handle window resize
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
+  clear(); // Clear on resize (drawings will be lost locally but that's ok)
 }
+
+// Prevent touch scrolling on the canvas
+document.addEventListener('touchmove', function(e) {
+  if (e.target.tagName === 'CANVAS') {
+    e.preventDefault();
+  }
+}, { passive: false });
