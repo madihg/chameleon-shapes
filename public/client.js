@@ -51,7 +51,7 @@ function connectToParty() {
 
 function setup() {
   let cnv = createCanvas(windowWidth, windowHeight);
-  cnv.style('position', 'absolute');
+  cnv.position(0, 0);
   cnv.style('z-index', '2');
   clear(); // Transparent background
   
